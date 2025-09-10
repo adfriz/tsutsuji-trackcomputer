@@ -376,10 +376,12 @@ class TrackControl():
             tgt = self.pointsequence_track.track[to_calc]['result']
             if search_mode == 0:
                 result = take_relpos_std(src,tgt)
-            elif search_mode == 1:
+            else:#if search_mode == 1:
                 result = take_relpos_std_vec(src,tgt)
+            '''
             else:
                 result = take_relpos_qtree(src,tgt,self.track[to_calc]['qtindex'],border_sq=search_rect)
+            '''
                 
         return(np.array(result))
     def relativepoint_all(self,owntrack=None,check_U=True,search_mode=2,search_rect=50):
@@ -719,7 +721,7 @@ class TrackControl():
             pdb.set_trace()
 
         # 全ての軌道データについてquadtreeを生成
-        if self.conf.general['search_mode'] == 2:
+        if self.conf.general['search_mode'] == 2 or True:
             for i in self.conf.track_keys:
                 self.track[i]['qtindex'] = self.generate_quadtree(self.track[i]['result'])#,self.conf.general['unit_length'])
                 for otkey in self.track[i]['data'].othertrack.data.keys():
