@@ -389,12 +389,24 @@ class TrackControl():
         owntrack = self.conf.owntrack if owntrack == None else owntrack
         calc_track = [i for i in self.conf.track_keys + self.conf.kml_keys + self.conf.csv_keys if i != owntrack]
         for tr in calc_track:
-            self.rel_track[tr]=self.relativepoint_single(tr,owntrack,check_U=check_U,search_mode=search_mode,search_rect=search_rect)
+            if '@' not in tr:
+                search_mode_tmp = self.conf.track_data[tr]['search_mode']
+                search_rect_tmp = self.conf.track_data[tr]['search_rect']
+            else:
+                search_mode_tmp = self.conf.general['search_mode']
+                search_rect_tmp = self.conf.general['search_rect']
+            self.rel_track[tr]=self.relativepoint_single(tr,owntrack,check_U=check_U,search_mode=search_mode_tmp,search_rect=search_rect_tmp)
 
         calc_track = [i for i in self.conf.track_keys if i != owntrack]
         for tr in calc_track:
+            if '@' not in tr:
+                search_mode_tmp = self.conf.track_data[tr]['search_mode']
+                search_rect_tmp = self.conf.track_data[tr]['search_rect']
+            else:
+                search_mode_tmp = self.conf.general['search_mode']
+                search_rect_tmp = self.conf.general['search_rect']
             for ottr in self.track[tr]['othertrack'].keys():
-                self.rel_track['@OT_{:s}@_{:s}'.format(tr,ottr)] = self.relativepoint_single(ottr,owntrack,parent_track=tr,check_U=check_U,search_mode=search_mode,search_rect=search_rect)
+                self.rel_track['@OT_{:s}@_{:s}'.format(tr,ottr)] = self.relativepoint_single(ottr,owntrack,parent_track=tr,check_U=check_U,search_mode=search_mode_tmp,search_rect=search_rect_tmp)
     def relativeradius(self,to_calc=None,owntrack=None):
         owntrack = self.conf.owntrack if owntrack == None else owntrack
         if to_calc is None:
