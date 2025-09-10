@@ -4,6 +4,11 @@
 
 - プロット画面
   - 任意角度への回転
+  
+## [1.9.3] - 2025-09-10
+
+- track毎に設定したsearch_mode, search_rectが反映されない問題を修正
+- kml/csvファイルから読み込んだ点列データに対してgenerateがエラーとなる問題を修正
 
 ## [1.9.2] - 2025-08-29
 
@@ -286,6 +291,7 @@
 
 - 1st release
 
+[1.9.3]: https://github.com/konawasabi/tsutsuji-trackcomputer/compare/ver1.9.2...ver1.9.3
 [1.9.2]: https://github.com/konawasabi/tsutsuji-trackcomputer/compare/ver1.9.1...ver1.9.2
 [1.9.1]: https://github.com/konawasabi/tsutsuji-trackcomputer/compare/ver1.9.0...ver1.9.1
 [1.9.0]: https://github.com/konawasabi/tsutsuji-trackcomputer/compare/ver1.8.2...ver1.9.0
