@@ -50,6 +50,7 @@ from . import trackwindow
 from . import heightwindow
 from . import kp_handling
 from . import mediantrack
+from .translator import lang
 
 class Catcher: # tkinter内で起きた例外をキャッチする
     def __init__(self, func, subst, widget):
@@ -73,7 +74,7 @@ class mainwindow(ttk.Frame):
     def __init__(self, master,args=None):
         self.parent = master
         super().__init__(master, padding='3 3 3 3')
-        self.master.title('Tsutsuji trackcomputer ver. {:s}'.format(__version__))
+        self.master.title('{:s} ver. {:s}'.format(lang.get("TITLE", "Tsutsuji trackcomputer"), __version__))
         self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -98,9 +99,18 @@ class mainwindow(ttk.Frame):
     def create_widgets(self):
         font_title = font.Font(weight='bold',size=10)
         
+        # ツールバーフレーム (Toolbar for language buttons)
+        self.toolbar_frame = ttk.Frame(self, padding='3 3 3 3')
+        self.toolbar_frame.grid(column=0, row=0, columnspan=2, sticky=(tk.W, tk.E))
+        
+        self.btn_jp = ttk.Button(self.toolbar_frame, text="JP", width=4, command=lambda: self.change_lang("ja"))
+        self.btn_jp.pack(side=tk.RIGHT, padx=2)
+        self.btn_en = ttk.Button(self.toolbar_frame, text="EN", width=4, command=lambda: self.change_lang("en"))
+        self.btn_en.pack(side=tk.RIGHT, padx=2)
+        
         # プロットフレーム
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
-        self.canvas_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.canvas_frame.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
         self.fig_plane = plt.figure(figsize=(9,7),tight_layout=True)
         gs1 = self.fig_plane.add_gridspec(nrows=1,ncols=1)
@@ -130,7 +140,7 @@ class mainwindow(ttk.Frame):
         
         #ボタンフレーム
         self.button_frame = ttk.Frame(self, padding='3 3 3 3')
-        self.button_frame.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.button_frame.grid(column=1, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
 
         # ---
         
@@ -229,7 +239,7 @@ class mainwindow(ttk.Frame):
         # ウィンドウリサイズに対する設定
         self.columnconfigure(0, weight=1)
         #self.columnconfigure(1, weight=1)
-        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
 
         # プロットウィンドウ描画
         self.drawall()
@@ -244,40 +254,46 @@ class mainwindow(ttk.Frame):
         self.menu_option = tk.Menu(self.menubar)
         self.menu_help = tk.Menu(self.menubar)
         
-        self.menubar.add_cascade(menu=self.menu_file, label='ファイル')
-        self.menubar.add_cascade(menu=self.menu_compute, label='メイン処理')
-        self.menubar.add_cascade(menu=self.menu_height, label='高度')
-        self.menubar.add_cascade(menu=self.menu_option, label='オプション')
-        self.menubar.add_cascade(menu=self.menu_help, label='ヘルプ')
+        self.menubar.add_cascade(menu=self.menu_file, label=lang.get("MENU_FILE", "ファイル"))
+        self.menubar.add_cascade(menu=self.menu_compute, label=lang.get("MENU_COMPUTE", "メイン処理"))
+        self.menubar.add_cascade(menu=self.menu_height, label=lang.get("MENU_HEIGHT", "高度"))
+        self.menubar.add_cascade(menu=self.menu_option, label=lang.get("MENU_OPTION", "オプション"))
+        self.menubar.add_cascade(menu=self.menu_help, label=lang.get("MENU_HELP", "ヘルプ"))
         
-        self.menu_file.add_command(label='開く...', command=self.opencfg, accelerator='Control+O')
-        self.menu_file.add_command(label='リロード', command=self.reloadcfg, accelerator='F5')
+        self.menu_file.add_command(label=lang.get("MENU_OPEN", "開く..."), command=self.opencfg, accelerator='Control+O')
+        self.menu_file.add_command(label=lang.get("MENU_RELOAD", "リロード"), command=self.reloadcfg, accelerator='F5')
         self.menu_file.add_separator()
-        self.menu_file.add_command(label='終了', command=self.ask_quit, accelerator='Alt+F4')
+        self.menu_file.add_command(label=lang.get("MENU_QUIT", "終了"), command=self.ask_quit, accelerator='Alt+F4')
 
-        self.menu_compute.add_command(label='Measure...', command=self.measure, accelerator='Control+M')
-        self.menu_compute.add_command(label='Generate', command=self.generate_output, accelerator='Control+G')
+        self.menu_compute.add_command(label=lang.get("MENU_MEASURE", "Measure..."), command=self.measure, accelerator='Control+M')
+        self.menu_compute.add_command(label=lang.get("MENU_GENERATE", "Generate"), command=self.generate_output, accelerator='Control+G')
         self.menu_compute.add_separator()
-        self.menu_compute.add_command(label='Replot', command=self.drawall, accelerator='Return')
+        self.menu_compute.add_command(label=lang.get("MENU_REPLOT", "Replot"), command=self.drawall, accelerator='Return')
 
         self.heightwindow.create_menu()
         
-        self.menu_option.add_command(label='Backimg...', command=self.backimgctrl.create_window)
-        self.menu_option.add_command(label='Load Backimg...', command=self.backimgctrl.load_setting)
-        self.menu_option.add_command(label='Save Backimg...', command=self.backimgctrl.save_setting)
+        self.menu_option.add_command(label=lang.get("MENU_BACKIMG", "Backimg..."), command=self.backimgctrl.create_window)
+        self.menu_option.add_command(label=lang.get("MENU_LOAD_BACKIMG", "Load Backimg..."), command=self.backimgctrl.load_setting)
+        self.menu_option.add_command(label=lang.get("MENU_SAVE_BACKIMG", "Save Backimg..."), command=self.backimgctrl.save_setting)
         self.menu_option.add_separator()
-        self.menu_option.add_command(label='Maptile...', command=self.staticmapctrl.create_paramwindow, accelerator='Control+T')
-        self.menu_option.add_command(label='Refresh Maptile', command=self.getmaptile, accelerator='Shift+Return')
-        self.menu_option.add_command(label='Export Maptile...', command=self.staticmapctrl.export)
+        self.menu_option.add_command(label=lang.get("MENU_MAPTILE", "Maptile..."), command=self.staticmapctrl.create_paramwindow, accelerator='Control+T')
+        self.menu_option.add_command(label=lang.get("MENU_REFRESH_MAPTILE", "Refresh Maptile"), command=self.getmaptile, accelerator='Shift+Return')
+        self.menu_option.add_command(label=lang.get("MENU_EXPORT_MAPTILE", "Export Maptile..."), command=self.staticmapctrl.export)
         self.menu_option.add_separator()
-        self.menu_option.add_command(label='Track...', command=self.trackwindow.create_window)
+        self.menu_option.add_command(label=lang.get("MENU_TRACK", "Track..."), command=self.trackwindow.create_window)
         self.menu_option.add_separator()
-        self.menu_option.add_command(label='Handling kiloposts...', command = lambda: kp_handling.GUI(self))
+        self.menu_option.add_command(label=lang.get("MENU_KILOPOSTS", "Handling kiloposts..."), command = lambda: kp_handling.GUI(self))
         self.menu_option.add_separator()
-        self.menu_option.add_command(label='Mediantrack...', command = lambda: mediantrack.GUI(self))
+        self.menu_option.add_command(label=lang.get("MENU_MEDIANTRACK", "Mediantrack..."), command = lambda: mediantrack.GUI(self))
+        self.menu_option.add_separator()
         
-        self.menu_help.add_command(label='ヘルプ...', command=self.open_webdocument)
-        self.menu_help.add_command(label='Tsutsujiについて...', command=self.aboutwindow)
+        self.menu_lang = tk.Menu(self.menu_option)
+        self.menu_option.add_cascade(menu=self.menu_lang, label=lang.get("MENU_LANG", "Language / 言語"))
+        for code, name in lang.get_available_languages().items():
+            self.menu_lang.add_command(label=name, command=lambda c=code: self.change_lang(c))
+        
+        self.menu_help.add_command(label=lang.get("MENU_HELP_DOC", "ヘルプ..."), command=self.open_webdocument)
+        self.menu_help.add_command(label=lang.get("MENU_ABOUT", "Tsutsujiについて..."), command=self.aboutwindow)
         
         self.master['menu'] = self.menubar
     def bind_keyevent(self):
@@ -295,7 +311,7 @@ class mainwindow(ttk.Frame):
         self.master.bind("<Shift-Down>", self.press_arrowkey)
     def ask_quit(self, event=None, ask=True):
         if ask:
-            if tk.messagebox.askyesno(message='Tsutsuji を終了しますか？'):
+            if tk.messagebox.askyesno(message=lang.get("MSG_QUIT", "Tsutsuji を終了しますか？")):
                 self.quit()
         else:
             self.quit()
@@ -391,6 +407,10 @@ class mainwindow(ttk.Frame):
         msg += 'Released under the Apache License, Version 2.0 .\n'
         msg += 'https://www.apache.org/licenses/LICENSE-2.0'
         tk.messagebox.showinfo(message=msg)
+    def change_lang(self, lang_code):
+        lang.save_language(lang_code)
+        self.master.title('{:s} ver. {:s}'.format(lang.get("TITLE", "Tsutsuji trackcomputer"), __version__))
+        self.create_menubar()
     def open_webdocument(self, event=None):
         webbrowser.open('https://konawasabi.github.io/tsutsuji-trackcomputer/')
     def sendtopmost(self,event=None):
